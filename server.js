@@ -1,41 +1,52 @@
-const express = require("express");
-const cors = require("cors");
-const morgan = require("morgan");
-const dotenv = require("dotenv");
-const colors = require("colors");
-const path = require("path");
-const connectDb = require("./config/connectDb");
-// config dot env file
+import express from "express";
+import colors from "colors";
+import dotenv from "dotenv";
+import morgan from "morgan";
+import connectDB from "./config/db.js";
+import authRoutes from "./routes/authRoute.js";
+import categoryRoutes from "./routes/categoryRoutes.js";
+import productRoutes from "./routes/productRoutes.js";
+import cors from "cors";
+// import path from "path";
+// import { fileURLToPath } from "url";
+//configure env
 dotenv.config();
 
-//databse call
-connectDb();
+//databse config
+connectDB();
 
+//esmodeule fix
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 //rest object
 const app = express();
 
-//middlewares
-app.use(morgan("dev"));
-app.use(express.json());
+//middelwares
 app.use(cors());
+app.use(express.json());
+app.use(morgan("dev"));
+//app.use(express.static(path.join(__dirname, './client/build')));
 
 //routes
-//user routes
-app.use("/api/v1/users", require("./routes/userRoute"));
-//transections routes
-app.use("/api/v1/transections", require("./routes/transectionRoutes"));
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/category", categoryRoutes);
+app.use("/api/v1/product", productRoutes);
 
-//static files
-app.use(express.static(path.join(__dirname, "./client/build")));
-
-app.get("*", function (req, res) {
-  res.sendFile(path.join(__dirname, "./client/build/index.html"));
+//rest api
+// app.get('*', function (req, res) {
+//   res.sendFile(path.join(__dirname, './client/build/index.html'));
+// });
+app.get("/",  (req, res) => {
+  res.send("<h1>welcome to website</h1>");
 });
 
-//port
-const PORT = 8080 || process.env.PORT;
+//PORT
+const PORT = process.env.PORT || 8080;
 
-//listen server
+//run listen
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(
+    `Server Running on ${process.env.DEV_MODE} mode on port ${PORT}`.bgCyan
+      .white
+  );
 });
