@@ -1,52 +1,41 @@
-import express from "express";
-import colors from "colors";
-import dotenv from "dotenv";
-import morgan from "morgan";
-import connectDB from "./config/db.js";
-import authRoutes from "./routes/authRoute.js";
-import categoryRoutes from "./routes/categoryRoutes.js";
-import productRoutes from "./routes/productRoutes.js";
-import cors from "cors";
-import path from "path";
-import { fileURLToPath } from "url";
-//configure env
+const express = require("express");
+const cors = require("cors");
+const morgan = require("morgan");
+const dotenv = require("dotenv");
+const colors = require("colors");
+const path = require("path");
+const connectDb = require("./config/connectDb");
+// config dot env file
 dotenv.config();
 
-//databse config
-connectDB();
+//databse call
+connectDb();
 
-//esmodeule fix
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 //rest object
 const app = express();
 
-//middelwares
-app.use(cors());
-app.use(express.json());
+//middlewares
 app.use(morgan("dev"));
-app.use(express.static(path.join(__dirname, './client/build')));
+app.use(express.json());
+app.use(cors());
 
 //routes
-app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/category", categoryRoutes);
-app.use("/api/v1/product", productRoutes);
+//user routes
+app.use("/api/v1/users", require("./routes/userRoute"));
+//transections routes
+app.use("/api/v1/transections", require("./routes/transectionRoutes"));
 
-//rest api
-app.get('*', function (req, res) {
-  res.sendFile(path.join(__dirname, './client/build/index.html'));
+//static files
+app.use(express.static(path.join(__dirname, "./client/build")));
+
+app.get("*", function (req, res) {
+  res.sendFile(path.join(__dirname, "./client/build/index.html"));
 });
-// app.get("/",  (req, res) => {
-//   res.send("<h1>welcome to website</h1>");
-// });
 
-//PORT
-const PORT = process.env.PORT || 8080;
+//port
+const PORT = 8080 || process.env.PORT;
 
-//run listen
+//listen server
 app.listen(PORT, () => {
-  console.log(
-    `Server Running on ${process.env.DEV_MODE} mode on port ${PORT}`.bgCyan
-      .white
-  );
+  console.log(`Server running on port ${PORT}`);
 });
