@@ -41,7 +41,7 @@ app.get('*', function (req, res) {
 // });
 
 //PORT
-const PORT = process.env.REACT_APP_API;
+const PORT = process.env.PORT;
 
 //run listen
 app.listen(PORT, () => {
